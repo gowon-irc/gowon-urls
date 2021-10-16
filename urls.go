@@ -77,3 +77,27 @@ func getTitles(bodys [][]byte) []string {
 
 	return titles
 }
+
+func filterUrls(urls []string, filters []*regexp.Regexp) []string {
+	filterSingle := func(url string, filters []*regexp.Regexp) bool {
+		for _, f := range filters {
+			if f.MatchString(url) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	filtered := []string{}
+
+	for _, u := range urls {
+		if filterSingle(u, filters) {
+			continue
+		}
+
+		filtered = append(filtered, u)
+	}
+
+	return filtered
+}

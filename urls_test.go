@@ -255,3 +255,57 @@ func TestGetTitles(t *testing.T) {
 		})
 	}
 }
+
+func TestFilterUrls(t *testing.T) {
+	filter1 := regexp.MustCompile(`.*website.com.*`)
+	filter2 := regexp.MustCompile(`.*test.com.*`)
+
+	url1 := "www.website.com/1"
+	url2 := "http://test.com/2"
+	url3 := "https://www.url.com/3"
+
+	cases := []struct {
+		name     string
+		urls     []string
+		filters  []*regexp.Regexp
+		filtered []string
+	}{
+		{
+			name:     "one url one filter no results",
+			urls:     []string{url1},
+			filters:  []*regexp.Regexp{filter1},
+			filtered: []string{},
+		},
+		{
+			name:     "one url one filter one result",
+			urls:     []string{url1},
+			filters:  []*regexp.Regexp{filter2},
+			filtered: []string{url1},
+		},
+		{
+			name:     "two urls one filter one result",
+			urls:     []string{url1, url2},
+			filters:  []*regexp.Regexp{filter1},
+			filtered: []string{url2},
+		},
+		{
+			name:     "one url no filter one result",
+			urls:     []string{url1},
+			filters:  []*regexp.Regexp{},
+			filtered: []string{url1},
+		},
+		{
+			name:     "three urls two filters one result",
+			urls:     []string{url1, url2, url3},
+			filters:  []*regexp.Regexp{filter1, filter2},
+			filtered: []string{url3},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			filtered := filterUrls(tc.urls, tc.filters)
+			assert.Equal(t, tc.filtered, filtered)
+		})
+	}
+}

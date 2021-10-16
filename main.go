@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -15,20 +16,24 @@ import (
 )
 
 type Options struct {
-	Prefix string `short:"P" long:"prefix" env:"GOWON_PREFIX" default:"." description:"prefix for commands"`
-	Broker string `short:"b" long:"broker" env:"GOWON_BROKER" default:"localhost:1883" description:"mqtt broker"`
+	Prefix  string   `short:"P" long:"prefix" env:"GOWON_PREFIX" default:"." description:"prefix for commands"`
+	Broker  string   `short:"b" long:"broker" env:"GOWON_BROKER" default:"localhost:1883" description:"mqtt broker"`
+	Filters []string `short:"f" long:"filters" env:"GOWON_URL_FILTERS" env-delim:"," description:"filters to apply to urls"`
 }
 
 const (
 	mqttConnectRetryInternal = 5 * time.Second
 )
 
-func urlHandler(m gowon.Message) (string, error) {
-	urls := extractUrls(m.Msg)
-	bodys := getBodys(urls)
-	titles := getTitles(bodys)
+func genUrlHandler(filters []*regexp.Regexp) func(m gowon.Message) (string, error) {
+	return func(m gowon.Message) (string, error) {
+		urls := extractUrls(m.Msg)
+		filtered := filterUrls(urls, filters)
+		bodys := getBodys(filtered)
+		titles := getTitles(bodys)
 
-	return strings.Join(titles, "\n"), nil
+		return strings.Join(titles, "\n"), nil
+	}
 }
 
 func main() {
@@ -49,8 +54,14 @@ func main() {
 		panic(token.Error())
 	}
 
+	filters := []*regexp.Regexp{}
+	for _, f := range opts.Filters {
+		r := regexp.MustCompile(f)
+		filters = append(filters, r)
+	}
+
 	mr := gowon.NewMessageRouter()
-	mr.AddRegex(urlRegex, urlHandler)
+	mr.AddRegex(urlRegex, genUrlHandler(filters))
 	mr.Subscribe(c, "gowon-urls")
 
 	sigs := make(chan os.Signal, 1)
