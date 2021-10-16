@@ -18,7 +18,7 @@ import (
 type Options struct {
 	Prefix  string   `short:"P" long:"prefix" env:"GOWON_PREFIX" default:"." description:"prefix for commands"`
 	Broker  string   `short:"b" long:"broker" env:"GOWON_BROKER" default:"localhost:1883" description:"mqtt broker"`
-	Filters []string `short:"f" long:"filters" env:"GOWON_URL_FILTERS" env-delim:"," description:"filters to apply to urls"`
+	Filters []string `short:"f" long:"filters" env:"GOWON_URL_FILTERS" env-delim:"," description:"regex filters to apply to urls"`
 }
 
 const (
