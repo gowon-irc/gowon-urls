@@ -139,7 +139,7 @@ jobs:
           file: ./Dockerfile
           push: ${{ steps.prep.outputs.push }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/gowon:latest
-            ghcr.io/${{ github.repository_owner }}/gowon:${{ steps.prep.outputs.gitversionf }}
+            ghcr.io/${{ github.repository_owner }}/gowon-urls:latest
+            ghcr.io/${{ github.repository_owner }}/gowon-urls:${{ steps.prep.outputs.gitversionf }}
           cache-from: ${{ steps.prep.outputs.cache_from }}
           cache-to: ${{ steps.prep.outputs.cache_to }}
