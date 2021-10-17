@@ -22,7 +22,7 @@ type Options struct {
 }
 
 const (
-	moduleName               = "jod"
+	moduleName               = "urls"
 	mqttConnectRetryInternal = 5
 	mqttDisconnectTimeout    = 1000
 )
