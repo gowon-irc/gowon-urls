@@ -3,7 +3,7 @@ COPY . /src
 WORKDIR /src
 RUN go build -o gowon-urls
 
-FROM alpine:3.15.0
+FROM alpine:3.19.1
 WORKDIR /app
 COPY --from=build-env /src/gowon-urls /app/
 ENTRYPOINT ["./gowon-urls"]
